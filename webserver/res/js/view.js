@@ -28,7 +28,7 @@ $(document).ready(function () {
     });
 
 
-    function connectRoboter () {
+    function connectRoboter() {
         var ipRobo1 = $selection.start.robo1.input.val();
         var ipRobo2 = $selection.start.robo2.input.val();
         var ipRobo3 = $selection.start.robo3.input.val();
@@ -58,12 +58,11 @@ $(document).ready(function () {
         });
     }
 
-    function createRequest (url, para) {
-        return $.ajax({
-            url : "http://" + url + "/" + para,
-            dataType : "jsonp",
-            timeout : 10000
-        })
+    function createRequest(url, para) {
+        return fetch("http://" + url + "/" + para)
+            .then(function (response) {
+                return response.text();
+            });
     }
 });
 
