@@ -13,6 +13,10 @@ public class Server {
 	static HttpServer httpServer;
 	
 	static Thread serverThread;
+	
+	static InetSocketAddress detectConnection;
+	static InetSocketAddress storeConnection;
+	static InetSocketAddress outConnection;
 
 	public static void main(String[] args) throws IOException {
 		httpServer = HttpServer.create( new InetSocketAddress(8000), 0);
@@ -46,8 +50,18 @@ public class Server {
 			String[] robotConnections= gson.fromJson(json, String[].class);
 			System.out.println(String.join(", ", robotConnections));
 			for (String con : robotConnections) {
-				sendCommand(parseAddress(con), "connect");
+				try {
+					sendCommand(parseAddress(con), "connect");
+					System.out.println(con + ": " + "OK");
+				} catch (Exception ex) {
+					System.err.println(ex.toString());
+				}
+				
 			}
+			detectConnection = parseAddress(robotConnections[0]);
+			storeConnection = parseAddress(robotConnections[1]);
+			outConnection = parseAddress(robotConnections[2]);
+
 			t.sendResponseHeaders(204, 0);
 		}
 	}
@@ -65,7 +79,7 @@ public class Server {
 	}
 	
 	static String sendCommand(InetSocketAddress addr, String command) throws IOException {
-		URL url = new URL(addr.toString() + "/" + command);
+		URL url = new URL("http:/" + addr.toString() + "/" + command);
 		URLConnection connection = url.openConnection();
 		InputStream response = connection.getInputStream();
 		String res =  readStream(response);
@@ -74,7 +88,7 @@ public class Server {
 	}
 	
 	static String sendCommand(InetSocketAddress addr, String command, String body) throws IOException {
-		URL url = new URL(addr.toString() + "/" + command);
+		URL url = new URL("http:/" + addr.toString() + "/" + command);
 		URLConnection connection = url.openConnection();
 		connection.setDoOutput(true); // Triggers POST.
 		connection.setRequestProperty("Content-Type", "application/json");
