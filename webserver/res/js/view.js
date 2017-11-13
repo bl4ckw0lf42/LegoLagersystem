@@ -12,13 +12,12 @@ $(document).ready(function () {
     var $controlLDiv = $("#controllDiv");
 
 
-
     $btnMainConnect.click(function () {
         connectRoboter();
     });
 
 
-    function connectRoboter () {
+    function connectRoboter() {
         var ipRobo1 = $inputRoboter1.val();
         var ipRobo2 = $inputRoboter2.val();
         var ipRobo3 = $inputRoboter3.val();
@@ -48,12 +47,11 @@ $(document).ready(function () {
         });
     }
 
-    function createRequest (url, para) {
-        return $.ajax({
-            url : "http://" + url + "/" + para,
-            dataType : "jsonp",
-            timeout : 10000
-        })
+    function createRequest(url, para) {
+        return fetch("http://" + url + "/" + para)
+            .then(function (response) {
+                return response.text();
+            });
     }
 });
 
