@@ -13,6 +13,10 @@ public class Server {
 	static HttpServer httpServer;
 	
 	static Thread serverThread;
+	
+	static InetSocketAddress detectConnection;
+	static InetSocketAddress storeConnection;
+	static InetSocketAddress outConnection;
 
 	public static void main(String[] args) throws IOException {
 		httpServer = HttpServer.create( new InetSocketAddress(8000), 0);
@@ -48,6 +52,10 @@ public class Server {
 			for (String con : robotConnections) {
 				sendCommand(parseAddress(con), "connect");
 			}
+			detectConnection = parseAddress(robotConnections[0]);
+			storeConnection = parseAddress(robotConnections[1]);
+			outConnection = parseAddress(robotConnections[2]);
+
 			t.sendResponseHeaders(204, 0);
 		}
 	}
