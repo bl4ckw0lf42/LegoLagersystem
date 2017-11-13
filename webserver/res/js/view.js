@@ -48,7 +48,7 @@ $(document).ready(function () {
 
     $selection.start.connectBtns.click(function () {
         if (allowConnection) {
-            $selection.start.server.connectionIcons
+            $selection.start.connectionIcons
                 .removeClass("fa-spinner fa-check-circle")
                 .addClass("fa-times-circle");
             connectRoboter();
@@ -76,7 +76,7 @@ $(document).ready(function () {
 */
         if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
 
-        $selection.start.connectBtns
+        $selection.start.connectionIcons
             .removeClass("fa-times-circle")
             .addClass("fa-spinner");
 
