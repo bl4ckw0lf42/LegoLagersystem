@@ -44,6 +44,9 @@ $(document).ready(function () {
     });
 
 
+    /**
+     * connects the Roboter and Starts shit
+     */
     function connectRoboter() {
         var ipRobo1 = $selection.start.robo1.input.val();
         var ipRobo2 = $selection.start.robo2.input.val();
@@ -78,6 +81,12 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * creates and sends Request
+     * @param url
+     * @param para
+     * @returns {*}
+     */
     function createRequest(url, para) {
         return fetch("http://" + url + "/" + para)
             .then(function (response) {
@@ -85,6 +94,11 @@ $(document).ready(function () {
             });
     }
 
+    /**
+     * adds an Item 
+     * @param itemText
+     * @param amount
+     */
     function addOrderListItem (itemText, amount) {
         var $collection = $("<li></li>")
             .addClass("collection-item avatar")
