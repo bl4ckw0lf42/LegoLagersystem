@@ -1,9 +1,15 @@
 $(document).ready(function () {
 
+    var iconClass = {
+        connected: "fa-check-circle",
+        error: "fa-times-circle",
+        load: "fa-spinner"
+    };
+
     var $selection = {
         start: {
             startDiv: $("#mainStartDiv"),
-            connectBtns: $("#btnMainConnect"),
+            connectBtn: $("#btnMainConnect"),
             connectionIcons: $(".connectionIcons"),
             server: {
                 icon: $("#iconServerConnection"),
@@ -46,11 +52,9 @@ $(document).ready(function () {
     var allowConnection = true;
 
 
-    $selection.start.connectBtns.click(function () {
+    $selection.start.connectBtn.click(function () {
         if (allowConnection) {
-            $selection.start.connectionIcons
-                .removeClass("fa-spinner fa-check-circle")
-                .addClass("fa-times-circle");
+            addIconClass($selection.start.connectionIcons, iconClass.error);
             connectRoboter();
         }
     });
@@ -76,11 +80,9 @@ $(document).ready(function () {
 */
         if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
 
-        $selection.start.connectionIcons
-            .removeClass("fa-times-circle")
-            .addClass("fa-spinner");
+        addIconClass($selection.start.connectionIcons, iconClass.load);
 
-        allowConnection = false;
+        allowConnect(false);
         
         var reqServer = createRequest(ipServer, "connect");
         var req1 = createRequest(ipRobo1, "connect");
@@ -90,55 +92,65 @@ $(document).ready(function () {
 
         Promise.all(reqArray).then(function (beObj) {
 
-            allowConnection = true;
+            allowConnect(true);
 
             $selection.start.startDiv.css("display", "none");
             $selection.main.mainDiv.css("display", "block");
 
             createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
         }, function (err) {
-            allowConnection = true;
+            allowConnect(true);
         });
 
         reqServer.then(function (beObj) {
-            $selection.start.server.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-check-circle");
+            addIconClass($selection.start.server.icon, iconClass.connected);
         }, function (err) {
-            $selection.start.server.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-times-circle");
+            addIconClass($selection.start.server.icon, iconClass.error);
         });
 
         req1.then(function (beObj) {
-            $selection.start.robo1.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-check-circle");
+            addIconClass($selection.start.robo1.icon, iconClass.connected);
         }, function (err) {
-            $selection.start.robo1.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-times-circle");
+            addIconClass($selection.start.robo1.icon, iconClass.error);
         });
 
         req2.then(function (beObj) {
-            $selection.start.robo2.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-check-circle");
+            addIconClass($selection.start.robo2.icon, iconClass.connected);
         }, function (err) {
-            $selection.start.robo2.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-times-circle");
+            addIconClass($selection.start.robo2.icon, iconClass.error);
         });
 
         req3.then(function (beObj) {
-            $selection.start.robo3.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-check-circle");
+            addIconClass($selection.start.robo3.icon, iconClass.connected);
         }, function (err) {
-            $selection.start.robo3.icon
-                .removeClass("fa-spinner")
-                .addClass("fa-times-circle");
+            addIconClass($selection.start.robo3.icon, iconClass.error);
         });
+    }
+
+    /**
+     * disable / enable Connection Btn
+     * @param allow
+     */
+    function allowConnect (allow) {
+        if (allow) {
+            allowConnection = true;
+            $selection.start.connectBtn.removeClass("cursorNotAllowed");
+        }
+        else {
+            allowConnection = false;
+            $selection.start.connectBtn.addClass("cursorNotAllowed");
+        }
+    }
+
+    /**
+     * removes all Icon Class and adds new one
+     * @param $obj
+     * @param iconClass
+     */
+    function addIconClass ($obj, iconClass) {
+        $obj
+            .removeClass(iconClass.connected + " " + iconClass.load + " " + iconClass.error)
+            .addClass(iconClass);
     }
 
     /**
