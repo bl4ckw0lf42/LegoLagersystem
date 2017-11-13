@@ -10,13 +10,14 @@
 #roboterHubDiv {
     width: 50%;
     height: 200px;
+    float: left;
     background-color: grey;
 }
 
 #orderDIv {
     width: 50%;
     height: 200px;
-    float: right;
+    float: left;
     background-color: red;
 }
 
@@ -24,4 +25,12 @@
     width: 100%;
     height: 300px;
     background-color: yellow;
+}
+
+#roboterHub {
+    margin: auto;
+}
+
+.roboterHubText {
+    font-size: large;
 }

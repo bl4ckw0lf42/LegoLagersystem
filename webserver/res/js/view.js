@@ -1,16 +1,26 @@
 $(document).ready(function () {
 
-    var $mainDiv = $("#mainStartDiv");
-    var $btnMainConnect = $("#btnMainConnect");
-    var $iconRoboter1 = $("#iconRoboter1");
-    var $iconRoboter2 = $("#iconRoboter2");
-    var $iconRoboter3 = $("#iconRoboter3");
-    var $inputRoboter1 = $("#input_robo_1");
-    var $inputRoboter2 = $("#input_robo_2");
-    var $inputRoboter3 = $("#input_robo_3");
-
-    var $controlLDiv = $("#controllDiv");
-
+    var $selection = {
+        start: {
+            startDiv: $("#mainStartDiv"),
+            connectBtn: $("#btnMainConnect"),
+            robo1: {
+                icon: $("#iconRoboter1"),
+                input: $("#input_robo_1")
+            },
+            robo2: {
+                icon: $("#iconRoboter2"),
+                input: $("#input_robo_2")
+            },
+            robo3: {
+                icon: $("#iconRoboter3"),
+                input: $("#input_robo_3")
+            }
+        },
+        main: {
+            mainDiv: $("#controllDiv")
+        }
+    };
 
 
     $btnMainConnect.click(function () {
@@ -19,13 +29,13 @@ $(document).ready(function () {
 
 
     function connectRoboter () {
-        var ipRobo1 = $inputRoboter1.val();
-        var ipRobo2 = $inputRoboter2.val();
-        var ipRobo3 = $inputRoboter3.val();
+        var ipRobo1 = $selection.start.robo1.input.val();
+        var ipRobo2 = $selection.start.robo2.input.val();
+        var ipRobo3 = $selection.start.robo3.input.val();
 
 
-        $mainDiv.css("display", "none");
-        $controlLDiv.css("display", "block");
+        $selection.start.startDiv.css("display", "none");
+        $selection.main.mainDiv.css("display", "block");
         return;
 
         if (ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
