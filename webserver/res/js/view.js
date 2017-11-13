@@ -4,6 +4,10 @@ $(document).ready(function () {
         start: {
             startDiv: $("#mainStartDiv"),
             connectBtn: $("#btnMainConnect"),
+            server: {
+                icon: $("#iconServerConnection"),
+                input: $("#inputServerConnection")
+            },
             robo1: {
                 icon: $("#iconRoboter1"),
                 input: $("#input_robo_1")
@@ -45,14 +49,15 @@ $(document).ready(function () {
 
 
     /**
-     * connects the Roboter and Starts shit
+     * connects everything and Starts shit
      */
     function connectRoboter() {
+        var ipServer = $selection.start.server.input.val();
         var ipRobo1 = $selection.start.robo1.input.val();
         var ipRobo2 = $selection.start.robo2.input.val();
         var ipRobo3 = $selection.start.robo3.input.val();
 
-
+/*
         $selection.start.startDiv.css("display", "none");
         $selection.main.mainDiv.css("display", "block");
 
@@ -60,24 +65,46 @@ $(document).ready(function () {
             addOrderListItem("Red", 4);
         },2000)
         return;
+*/
+        if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
 
-        if (ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
-
+        var reqServer = createRequest(ipServer, "connect");
         var req1 = createRequest(ipRobo1, "connect");
         var req2 = createRequest(ipRobo2, "connect");
         var req3 = createRequest(ipRobo3, "connect");
+        var reqArray = [reqServer, req1, req2, req3];
 
+        Promise.all(reqArray).then(function (beObj) {
+            $selection.start.startDiv.css("display", "none");
+            $selection.main.mainDiv.css("display", "block");
 
-        req.then(function (ev) {
-            console.log("test");
+            createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
         });
 
-        req.done(function (ev) {
-            console.log('Yes! Success!');
+        reqServer.then(function (beObj) {
+            $selection.start.server.icon
+                .removeClass("fa-times-circle")
+                .addClass("fa-check-circle");
+
+            createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
         });
 
-        req.catch(function (ev) {
-            console.log('Oh noes!');
+        req1.then(function (beObj) {
+            $selection.start.robo1.icon
+                .removeClass("fa-times-circle")
+                .addClass("fa-check-circle");
+        });
+
+        req2.then(function (beObj) {
+            $selection.start.robo2.icon
+                .removeClass("fa-times-circle")
+                .addClass("fa-check-circle");
+        });
+
+        req3.then(function (beObj) {
+            $selection.start.robo3.icon
+                .removeClass("fa-times-circle")
+                .addClass("fa-check-circle");
         });
     }
 
@@ -94,6 +121,13 @@ $(document).ready(function () {
             });
     }
 
+    /**
+     * creates and sends Post Request
+     * @param url
+     * @param para
+     * @param body
+     * @returns {*}
+     */
     function createPostRequest(url, para, body) {
         return fetch("http://" + url + "/" + para, {
             method: "POST",
@@ -102,7 +136,7 @@ $(document).ready(function () {
     }
 
     /**
-     * adds an Item 
+     * adds an Item to the Order List
      * @param itemText
      * @param amount
      */
@@ -145,9 +179,7 @@ $(document).ready(function () {
             }
         });
 
-
         $collection.append($iconColor).append($amount).append($text).append($iconOrder);
-
         $selection.main.order.table.append($collection);
     }
 });
