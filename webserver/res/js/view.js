@@ -95,7 +95,7 @@ $(document).ready(function () {
     }
 
     /**
-     * adds an Item 
+     * adds an Item to the Order List
      * @param itemText
      * @param amount
      */
