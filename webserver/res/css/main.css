@@ -76,12 +76,35 @@ p {
     cursor: not-allowed;
 }
 
-.fa-spinner{
-    -webkit-transform-origin: 50% 58%;
-    transform-origin:50% 58%;
-    -ms-transform-origin:50% 58%; /* IE 9 */
-    -webkit-animation: spin .2s infinite linear;
-    -moz-animation: spin .2s infinite linear;
-    -o-animation: spin .2s infinite linear;
-    animation: spin .2s infinite linear;
+.fa-spinner {
+    color:#afafaf;
+    -moz-animation: spin .4s 1 linear;
+    -o-animation: spin .4s 1 linear;
+    -webkit-animation: spin .4s 1 linear;
+    animation: spin .4s 1 linear;
+}
+
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(359deg); }
+}
+
+@-moz-keyframes spin {
+    0% { -moz-transform: rotate(0deg); }
+    100% { -moz-transform: rotate(359deg); }
+}
+
+@-o-keyframes spin {
+    0% { -o-transform: rotate(0deg); }
+    100% { -o-transform: rotate(359deg); }
+}
+
+@-ms-keyframes spin {
+    0% { -ms-transform: rotate(0deg); }
+    100% { -ms-transform: rotate(359deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(359deg); }
 }
