@@ -43,12 +43,16 @@ $(document).ready(function () {
         }
     };
 
+    var allowConnection = true;
+
 
     $selection.start.connectBtns.click(function () {
-        $selection.start.server.connectionIcons
-            .removeClass("fa-spinner fa-check-circle")
-            .addClass("fa-times-circle");
-        connectRoboter();
+        if (allowConnection) {
+            $selection.start.server.connectionIcons
+                .removeClass("fa-spinner fa-check-circle")
+                .addClass("fa-times-circle");
+            connectRoboter();
+        }
     });
 
 
@@ -75,6 +79,8 @@ $(document).ready(function () {
         $selection.start.connectBtns
             .removeClass("fa-times-circle")
             .addClass("fa-spinner");
+
+        allowConnection = false;
         
         var reqServer = createRequest(ipServer, "connect");
         var req1 = createRequest(ipRobo1, "connect");
@@ -83,10 +89,15 @@ $(document).ready(function () {
         var reqArray = [reqServer, req1, req2, req3];
 
         Promise.all(reqArray).then(function (beObj) {
+
+            allowConnection = true;
+
             $selection.start.startDiv.css("display", "none");
             $selection.main.mainDiv.css("display", "block");
 
             createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
+        }, function (err) {
+            allowConnection = true;
         });
 
         reqServer.then(function (beObj) {
