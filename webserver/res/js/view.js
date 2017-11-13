@@ -48,7 +48,7 @@ $(document).ready(function () {
 
     $selection.start.connectBtns.click(function () {
         if (allowConnection) {
-            $selection.start.server.connectionIcons
+            $selection.start.connectionIcons
                 .removeClass("fa-spinner fa-check-circle")
                 .addClass("fa-times-circle");
             connectRoboter();
