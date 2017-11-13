@@ -18,12 +18,28 @@ $(document).ready(function () {
             }
         },
         main: {
-            mainDiv: $("#controllDiv")
+            mainDiv: $("#controllDiv"),
+            roboterHub: {
+                div: $("#roboterHubDiv"),
+                robo1: {
+                    action: $("#roboter1Hub")
+                },
+                robo2: {
+                    action: $("#roboter2Hub")
+                },
+                robo3: {
+                    action: $("#roboter3Hub")
+                }
+            },
+            order: {
+                div: $("#orderDIv"),
+                table: $("#orderTable")
+            }
         }
     };
 
 
-    $btnMainConnect.click(function () {
+    $selection.start.connectBtn.click(function () {
         connectRoboter();
     });
 
@@ -36,6 +52,10 @@ $(document).ready(function () {
 
         $selection.start.startDiv.css("display", "none");
         $selection.main.mainDiv.css("display", "block");
+
+        setTimeout(function () {
+            addOrderListItem("Red", 4);
+        },2000)
         return;
 
         if (ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
@@ -63,6 +83,51 @@ $(document).ready(function () {
             .then(function (response) {
                 return response.text();
             });
+    }
+
+    function addOrderListItem (itemText, amount) {
+        var $collection = $("<li></li>")
+            .addClass("collection-item avatar")
+            .data("amount", amount);
+
+        var $iconColor = $("<div></div>")
+            .addClass("orderIconColor")
+            .css("background-color", itemText.toLowerCase());
+
+        var $amount = $("<span></span>")
+            .addClass("title orderAmount")
+            .html(amount + "x");
+
+        var $text = $("<span></span>")
+            .addClass("title")
+            .html(itemText);
+
+        var $iconOrder = $("<i></i>")
+            .addClass("orderIcon fa fa-paper-plane");
+
+
+        $collection.on("click", function (ev) {
+            var $target = $(ev.currentTarget);
+            var $amount = $target.find(".orderAmount");
+            var amount = $target.data("amount");
+
+            $target.data("amount", (amount - 1));
+
+            // TODO sent order
+            console.log("ORDER");
+
+            if (amount < 2) {
+                $target.remove();
+            }
+            else {
+                $amount.html((amount - 1) + "x");
+            }
+        });
+
+
+        $collection.append($iconColor).append($amount).append($text).append($iconOrder);
+
+        $selection.main.order.table.append($collection);
     }
 });
 
