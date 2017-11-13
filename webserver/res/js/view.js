@@ -1,30 +1,64 @@
 $(document).ready(function () {
 
-    var $mainDiv = $("#mainStartDiv");
-    var $btnMainConnect = $("#btnMainConnect");
-    var $iconRoboter1 = $("#iconRoboter1");
-    var $iconRoboter2 = $("#iconRoboter2");
-    var $iconRoboter3 = $("#iconRoboter3");
-    var $inputRoboter1 = $("#input_robo_1");
-    var $inputRoboter2 = $("#input_robo_2");
-    var $inputRoboter3 = $("#input_robo_3");
+    var $selection = {
+        start: {
+            startDiv: $("#mainStartDiv"),
+            connectBtn: $("#btnMainConnect"),
+            robo1: {
+                icon: $("#iconRoboter1"),
+                input: $("#input_robo_1")
+            },
+            robo2: {
+                icon: $("#iconRoboter2"),
+                input: $("#input_robo_2")
+            },
+            robo3: {
+                icon: $("#iconRoboter3"),
+                input: $("#input_robo_3")
+            }
+        },
+        main: {
+            mainDiv: $("#controllDiv"),
+            roboterHub: {
+                div: $("#roboterHubDiv"),
+                robo1: {
+                    action: $("#roboter1Hub")
+                },
+                robo2: {
+                    action: $("#roboter2Hub")
+                },
+                robo3: {
+                    action: $("#roboter3Hub")
+                }
+            },
+            order: {
+                div: $("#orderDIv"),
+                table: $("#orderTable")
+            }
+        }
+    };
 
-    var $controlLDiv = $("#controllDiv");
 
-
-    $btnMainConnect.click(function () {
+    $selection.start.connectBtn.click(function () {
         connectRoboter();
     });
 
 
+    /**
+     * connects the Roboter and Starts shit
+     */
     function connectRoboter() {
-        var ipRobo1 = $inputRoboter1.val();
-        var ipRobo2 = $inputRoboter2.val();
-        var ipRobo3 = $inputRoboter3.val();
+        var ipRobo1 = $selection.start.robo1.input.val();
+        var ipRobo2 = $selection.start.robo2.input.val();
+        var ipRobo3 = $selection.start.robo3.input.val();
 
 
-        $mainDiv.css("display", "none");
-        $controlLDiv.css("display", "block");
+        $selection.start.startDiv.css("display", "none");
+        $selection.main.mainDiv.css("display", "block");
+
+        setTimeout(function () {
+            addOrderListItem("Red", 4);
+        },2000)
         return;
 
         if (ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
@@ -47,11 +81,67 @@ $(document).ready(function () {
         });
     }
 
+    /**
+     * creates and sends Request
+     * @param url
+     * @param para
+     * @returns {*}
+     */
     function createRequest(url, para) {
         return fetch("http://" + url + "/" + para)
             .then(function (response) {
                 return response.text();
             });
+    }
+
+    /**
+     * adds an Item 
+     * @param itemText
+     * @param amount
+     */
+    function addOrderListItem (itemText, amount) {
+        var $collection = $("<li></li>")
+            .addClass("collection-item avatar")
+            .data("amount", amount);
+
+        var $iconColor = $("<div></div>")
+            .addClass("orderIconColor")
+            .css("background-color", itemText.toLowerCase());
+
+        var $amount = $("<span></span>")
+            .addClass("title orderAmount")
+            .html(amount + "x");
+
+        var $text = $("<span></span>")
+            .addClass("title")
+            .html(itemText);
+
+        var $iconOrder = $("<i></i>")
+            .addClass("orderIcon fa fa-paper-plane");
+
+
+        $collection.on("click", function (ev) {
+            var $target = $(ev.currentTarget);
+            var $amount = $target.find(".orderAmount");
+            var amount = $target.data("amount");
+
+            $target.data("amount", (amount - 1));
+
+            // TODO sent order
+            console.log("ORDER");
+
+            if (amount < 2) {
+                $target.remove();
+            }
+            else {
+                $amount.html((amount - 1) + "x");
+            }
+        });
+
+
+        $collection.append($iconColor).append($amount).append($text).append($iconOrder);
+
+        $selection.main.order.table.append($collection);
     }
 });
 
