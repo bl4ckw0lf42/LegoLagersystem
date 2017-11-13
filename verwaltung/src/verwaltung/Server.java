@@ -44,9 +44,14 @@ public class Server {
 		public void handle(HttpExchange t) throws IOException {
 			String json = readStream(t.getRequestBody());
 			String[] robotConnections= gson.fromJson(json, String[].class);
+			System.out.println(String.join(", ", robotConnections));
+			for (String con : robotConnections) {
+				sendCommand(parseAddress(con), "connect");
+			}
 			t.sendResponseHeaders(204, 0);
 		}
 	}
+	
 	
 	
 	static String readStream(InputStream is) {
@@ -58,5 +63,32 @@ public class Server {
 		String[] split = s.split(":");
 		return new InetSocketAddress(InetAddress.getByName(split[0]), Integer.parseInt(split[1]));
 	}
+	
+	static String sendCommand(InetSocketAddress addr, String command) throws IOException {
+		URL url = new URL(addr.toString() + "/" + command);
+		URLConnection connection = url.openConnection();
+		InputStream response = connection.getInputStream();
+		String res =  readStream(response);
+		response.close();
+		return res;
+	}
+	
+	static String sendCommand(InetSocketAddress addr, String command, String body) throws IOException {
+		URL url = new URL(addr.toString() + "/" + command);
+		URLConnection connection = url.openConnection();
+		connection.setDoOutput(true); // Triggers POST.
+		connection.setRequestProperty("Content-Type", "application/json");
 
+		OutputStream output = connection.getOutputStream();
+		output.write(body.getBytes());
+		output.close();
+		
+		InputStream response = connection.getInputStream();
+		
+		String res = readStream(response);
+		response.close();
+		return res;
+		
+	}
+	
 }
