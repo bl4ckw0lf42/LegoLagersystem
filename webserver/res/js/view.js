@@ -76,7 +76,7 @@ $(document).ready(function () {
 */
         if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
 
-        $selection.start.connectBtns
+        $selection.start.connectionIcons
             .removeClass("fa-times-circle")
             .addClass("fa-spinner");
 
