@@ -17,16 +17,31 @@ public class Server {
 	static InetSocketAddress detectConnection;
 	static InetSocketAddress storeConnection;
 	static InetSocketAddress outConnection;
+	static InetSocketAddress ownAdress;
 
 	public static void main(String[] args) throws IOException {
+		System.out.println(String.join(", ", args));
+		String interfaceName = args.length == 0 ? "wlan0" : args[0];
+		
 		httpServer = HttpServer.create( new InetSocketAddress(8000), 0);
 		
 		httpServer.createContext("/connect", new ConnectHandler());
 		httpServer.createContext("/start", new StartHandler());
 		
 		System.out.println("Starting http server thread.");
-		System.out.println("IP: " +  InetAddress.getLocalHost());
-		System.out.println("Port: " + 8000);
+		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+		while (interfaces.hasMoreElements()) {
+			NetworkInterface ni = interfaces.nextElement();
+			Enumeration<InetAddress> addresses = ni.getInetAddresses();
+			while (addresses.hasMoreElements()) {
+				InetAddress addr = addresses.nextElement();
+				if (addr.getClass() == Inet4Address.class && interfaceName.equals(ni.getName())) {
+					
+					ownAdress = new InetSocketAddress(addr, 8000);
+					System.out.println("Own adress: " + ownAdress);
+				}
+			}
+		}
 		serverThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
