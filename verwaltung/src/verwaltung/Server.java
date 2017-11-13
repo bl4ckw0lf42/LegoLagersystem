@@ -25,6 +25,8 @@ public class Server {
 		httpServer.createContext("/start", new StartHandler());
 		
 		System.out.println("Starting http server thread.");
+		System.out.println("IP: " +  InetAddress.getLocalHost());
+		System.out.println("Port: " + 8000);
 		serverThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
