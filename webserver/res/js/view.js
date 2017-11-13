@@ -145,12 +145,12 @@ $(document).ready(function () {
     /**
      * removes all Icon Class and adds new one
      * @param $obj
-     * @param iconClass
+     * @param iClass
      */
-    function addIconClass ($obj, iconClass) {
+    function addIconClass ($obj, iClass) {
         $obj
             .removeClass(iconClass.connected + " " + iconClass.load + " " + iconClass.error)
-            .addClass(iconClass);
+            .addClass(iClass);
     }
 
     /**
