@@ -4,6 +4,10 @@ $(document).ready(function () {
         start: {
             startDiv: $("#mainStartDiv"),
             connectBtn: $("#btnMainConnect"),
+            server: {
+                icon: $("#iconServerConnection"),
+                input: $("#inputServerConnection")
+            },
             robo1: {
                 icon: $("#iconRoboter1"),
                 input: $("#input_robo_1")
@@ -48,6 +52,7 @@ $(document).ready(function () {
      * connects the Roboter and Starts shit
      */
     function connectRoboter() {
+        var ipServer = $selection.start.server.input.val();
         var ipRobo1 = $selection.start.robo1.input.val();
         var ipRobo2 = $selection.start.robo2.input.val();
         var ipRobo3 = $selection.start.robo3.input.val();
@@ -61,8 +66,9 @@ $(document).ready(function () {
         },2000)
         return;
 
-        if (ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
+        if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
 
+        var reqServer = createPostRequest(ipServer, "", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
         var req1 = createRequest(ipRobo1, "connect");
         var req2 = createRequest(ipRobo2, "connect");
         var req3 = createRequest(ipRobo3, "connect");
