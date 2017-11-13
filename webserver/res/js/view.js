@@ -3,7 +3,8 @@ $(document).ready(function () {
     var $selection = {
         start: {
             startDiv: $("#mainStartDiv"),
-            connectBtn: $("#btnMainConnect"),
+            connectBtns: $("#btnMainConnect"),
+            connectionIcons: $(".connectionIcons"),
             server: {
                 icon: $("#iconServerConnection"),
                 input: $("#inputServerConnection")
@@ -42,9 +43,16 @@ $(document).ready(function () {
         }
     };
 
+    var allowConnection = true;
 
-    $selection.start.connectBtn.click(function () {
-        connectRoboter();
+
+    $selection.start.connectBtns.click(function () {
+        if (allowConnection) {
+            $selection.start.server.connectionIcons
+                .removeClass("fa-spinner fa-check-circle")
+                .addClass("fa-times-circle");
+            connectRoboter();
+        }
     });
 
 
@@ -68,6 +76,12 @@ $(document).ready(function () {
 */
         if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
 
+        $selection.start.connectBtns
+            .removeClass("fa-times-circle")
+            .addClass("fa-spinner");
+
+        allowConnection = false;
+        
         var reqServer = createRequest(ipServer, "connect");
         var req1 = createRequest(ipRobo1, "connect");
         var req2 = createRequest(ipRobo2, "connect");
@@ -75,36 +89,55 @@ $(document).ready(function () {
         var reqArray = [reqServer, req1, req2, req3];
 
         Promise.all(reqArray).then(function (beObj) {
+
+            allowConnection = true;
+
             $selection.start.startDiv.css("display", "none");
             $selection.main.mainDiv.css("display", "block");
 
             createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
+        }, function (err) {
+            allowConnection = true;
         });
 
         reqServer.then(function (beObj) {
             $selection.start.server.icon
-                .removeClass("fa-times-circle")
+                .removeClass("fa-spinner")
                 .addClass("fa-check-circle");
-
-            createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
+        }, function (err) {
+            $selection.start.server.icon
+                .removeClass("fa-spinner")
+                .addClass("fa-times-circle");
         });
 
         req1.then(function (beObj) {
             $selection.start.robo1.icon
-                .removeClass("fa-times-circle")
+                .removeClass("fa-spinner")
                 .addClass("fa-check-circle");
+        }, function (err) {
+            $selection.start.robo1.icon
+                .removeClass("fa-spinner")
+                .addClass("fa-times-circle");
         });
 
         req2.then(function (beObj) {
             $selection.start.robo2.icon
-                .removeClass("fa-times-circle")
+                .removeClass("fa-spinner")
                 .addClass("fa-check-circle");
+        }, function (err) {
+            $selection.start.robo2.icon
+                .removeClass("fa-spinner")
+                .addClass("fa-times-circle");
         });
 
         req3.then(function (beObj) {
             $selection.start.robo3.icon
-                .removeClass("fa-times-circle")
+                .removeClass("fa-spinner")
                 .addClass("fa-check-circle");
+        }, function (err) {
+            $selection.start.robo3.icon
+                .removeClass("fa-spinner")
+                .addClass("fa-times-circle");
         });
     }
 
@@ -139,15 +172,16 @@ $(document).ready(function () {
      * adds an Item to the Order List
      * @param itemText
      * @param amount
+     * @param color
      */
-    function addOrderListItem (itemText, amount) {
+    function addOrderListItem (itemText, amount, color) {
         var $collection = $("<li></li>")
             .addClass("collection-item avatar")
             .data("amount", amount);
 
         var $iconColor = $("<div></div>")
             .addClass("orderIconColor")
-            .css("background-color", itemText.toLowerCase());
+            .css("background-color", color || itemText.toLowerCase());
 
         var $amount = $("<span></span>")
             .addClass("title orderAmount")
