@@ -100,6 +100,13 @@ $(document).ready(function () {
             });
     }
 
+    function createPostRequest(url, para, body) {
+        return fetch("http://" + url + "/" + para, {
+            method: "POST",
+            body: body
+        });
+    }
+
     /**
      * adds an Item to the Order List
      * @param itemText
