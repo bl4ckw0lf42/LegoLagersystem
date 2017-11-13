@@ -1,12 +1,14 @@
 package verwaltung;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-
+import java.io.*;
+import java.net.*;
+import java.util.*;
 import com.sun.net.httpserver.*;
 import com.google.gson.*;
 
 public class Server {
+	
+	static Gson gson = new Gson();
 	
 	static HttpServer httpServer;
 	
@@ -15,7 +17,8 @@ public class Server {
 	public static void main(String[] args) throws IOException {
 		httpServer = HttpServer.create( new InetSocketAddress(8000), 0);
 		
-		httpServer.createContext("/connect");
+		httpServer.createContext("/connect", new ConnectHandler());
+		httpServer.createContext("/start", new StartHandler());
 		
 		System.out.println("Starting http server thread.");
 		serverThread = new Thread(new Runnable() {
@@ -30,6 +33,7 @@ public class Server {
 	static class ConnectHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
+			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 			t.sendResponseHeaders(204, 0);
 			System.out.println("Connect: " + t.getRemoteAddress());
 		}
@@ -38,8 +42,21 @@ public class Server {
 	static class StartHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
-			
+			String json = readStream(t.getRequestBody());
+			String[] robotConnections= gson.fromJson(json, String[].class);
+			t.sendResponseHeaders(204, 0);
 		}
+	}
+	
+	
+	static String readStream(InputStream is) {
+		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+	    return s.hasNext() ? s.next() : "";
+	}
+	
+	static InetSocketAddress parseAddress(String s) throws NumberFormatException, UnknownHostException {
+		String[] split = s.split(":");
+		return new InetSocketAddress(InetAddress.getByName(split[0]), Integer.parseInt(split[1]));
 	}
 
 }
