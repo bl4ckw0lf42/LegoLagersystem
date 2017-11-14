@@ -55,7 +55,7 @@ public class Server {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
 			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
-			t.sendResponseHeaders(204, 0);
+			t.sendResponseHeaders(204, -1);
 			System.out.println("Connect: " + t.getRemoteAddress());
 		}
 	}
@@ -79,7 +79,7 @@ public class Server {
 			storeConnection = parseAddress(robotConnections[1]);
 			outConnection = parseAddress(robotConnections[2]);
 
-			t.sendResponseHeaders(204, 0);
+			t.sendResponseHeaders(204, -1);
 		}
 	}
 	
