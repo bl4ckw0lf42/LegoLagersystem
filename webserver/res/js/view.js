@@ -75,7 +75,7 @@ $(document).ready(function () {
 
         setTimeout(function () {
             addOrderListItem("Red", 4);
-        },2000)
+        },2000);
         return;
 */
         if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
