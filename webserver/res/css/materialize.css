@@ -3366,7 +3366,6 @@ nav ul a span.badge {
 }
 
 .container {
-  margin: 0 auto;
   max-width: 1280px;
   width: 90%;
 }
@@ -4266,7 +4265,6 @@ nav .button-collapse i {
 }
 
 nav .brand-logo {
-  position: absolute;
   color: #fff;
   display: inline-block;
   font-size: 2.1rem;
