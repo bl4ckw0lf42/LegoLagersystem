@@ -31,7 +31,7 @@
 }
 
 #mainStartDiv {
-    margin-top: 20%;
+    margin-top: 10%;
 }
 
 .startInputFields {
@@ -71,6 +71,10 @@
 
 .roboterAction {
     padding-left: 20%;
+}
+
+.nav-wrapper {
+    text-align: center;
 }
 
 p {
