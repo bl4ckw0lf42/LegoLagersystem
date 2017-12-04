@@ -5,6 +5,7 @@ import java.net.*;
 import java.util.*;
 import com.sun.net.httpserver.*;
 import com.google.gson.*;
+import com.mysql.jdbc.Util;
 
 public class Server {
 	
@@ -15,7 +16,7 @@ public class Server {
 	static Thread serverThread;
 	
 	static Detector detector;
-	static Remote inputter;
+	static Inputter inputter;
 	static Remote outputter;
 	
 	static InetSocketAddress ownAdress;
@@ -29,6 +30,7 @@ public class Server {
 		httpServer.createContext("/connect", new ConnectHandler());
 		httpServer.createContext("/start", new StartHandler());
 		httpServer.createContext("/detect", new DetectHandler());
+		httpServer.createContext("/fetched", new FetchedHandler());
 		
 		System.out.println("Starting http server thread.");
 		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -87,7 +89,7 @@ public class Server {
 			}
 			if (ok) {
 				detector = new Detector(addrs[0]);
-				inputter = new Remote(addrs[1]);
+				inputter = new Inputter(addrs[1]);
 				outputter = new Remote(addrs[2]);
 				System.out.println("Connections stored");
 			}
@@ -105,7 +107,20 @@ public class Server {
 			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 			System.out.println("Detected");
 			t.sendResponseHeaders(204, -1);
-			detector.unlock();
+			inputter.fetch();
+		}
+	}
+	
+	static class FetchedHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange t) throws IOException {
+			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+			InputStream is = t.getRequestBody();
+			String art = Utils.readStream(is);
+			is.close();
+			System.out.println("");
+			t.sendResponseHeaders(204, -1);
+			inputter.fetch();
 		}
 	}
 	
