@@ -14,9 +14,10 @@ public class Server {
 	
 	static Thread serverThread;
 	
-	static InetSocketAddress detectConnection;
-	static InetSocketAddress storeConnection;
-	static InetSocketAddress outConnection;
+	static Detector detector;
+	static Remote inputter;
+	static Remote outputter;
+	
 	static InetSocketAddress ownAdress;
 
 	public static void main(String[] args) throws IOException {
@@ -27,6 +28,7 @@ public class Server {
 		
 		httpServer.createContext("/connect", new ConnectHandler());
 		httpServer.createContext("/start", new StartHandler());
+		httpServer.createContext("/detect", new DetectHandler());
 		
 		System.out.println("Starting http server thread.");
 		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -63,63 +65,48 @@ public class Server {
 	static class StartHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
-			String json = readStream(t.getRequestBody());
-			String[] robotConnections= gson.fromJson(json, String[].class);
+			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+			String json = Utils.readStream(t.getRequestBody());
+			String[] robotConnections = gson.fromJson(json, String[].class);
 			System.out.println(String.join(", ", robotConnections));
-			for (String con : robotConnections) {
+			InetSocketAddress[] addrs = new InetSocketAddress[3];
+			
+			boolean ok = true;
+			for (int i=0; i<addrs.length; i++) {
 				try {
-					sendCommand(parseAddress(con), "connect");
+					String con = robotConnections[i];
+					addrs[i] = Utils.parseAddress(con);
+					
+					Remote.sendCommand(addrs[1], "connect", null);
 					System.out.println(con + ": " + "OK");
 				} catch (Exception ex) {
 					System.err.println(ex.toString());
+					ok = false;
 				}
 				
 			}
-			detectConnection = parseAddress(robotConnections[0]);
-			storeConnection = parseAddress(robotConnections[1]);
-			outConnection = parseAddress(robotConnections[2]);
+			if (ok) {
+				detector = new Detector(addrs[0]);
+				inputter = new Remote(addrs[1]);
+				outputter = new Remote(addrs[2]);
+				System.out.println("Connections stored");
+			}
+			
+			detector.start(ownAdress);
+			
 
 			t.sendResponseHeaders(204, -1);
 		}
 	}
 	
-	
-	
-	static String readStream(InputStream is) {
-		java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-	    return s.hasNext() ? s.next() : "";
-	}
-	
-	static InetSocketAddress parseAddress(String s) throws NumberFormatException, UnknownHostException {
-		String[] split = s.split(":");
-		return new InetSocketAddress(InetAddress.getByName(split[0]), Integer.parseInt(split[1]));
-	}
-	
-	static String sendCommand(InetSocketAddress addr, String command) throws IOException {
-		URL url = new URL("http:/" + addr.toString() + "/" + command);
-		URLConnection connection = url.openConnection();
-		InputStream response = connection.getInputStream();
-		String res =  readStream(response);
-		response.close();
-		return res;
-	}
-	
-	static String sendCommand(InetSocketAddress addr, String command, String body) throws IOException {
-		URL url = new URL("http:/" + addr.toString() + "/" + command);
-		URLConnection connection = url.openConnection();
-		connection.setDoOutput(true); // Triggers POST.
-		connection.setRequestProperty("Content-Type", "application/json");
-
-		OutputStream output = connection.getOutputStream();
-		output.write(body.getBytes());
-		output.close();
-		
-		InputStream response = connection.getInputStream();
-		
-		String res = readStream(response);
-		response.close();
-		return res;
-		
+	static class DetectHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange t) throws IOException {
+			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+			System.out.println("Detected");
+			t.sendResponseHeaders(204, -1);
+			detector.unlock();
+		}
 	}
 	
 }
