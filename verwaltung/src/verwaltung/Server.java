@@ -3,6 +3,8 @@ package verwaltung;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+
 import com.sun.net.httpserver.*;
 import com.google.gson.*;
 import com.mysql.jdbc.Util;
@@ -94,7 +96,13 @@ public class Server {
 				System.out.println("Connections stored");
 			}
 			
-			detector.start(ownAdress);
+			try {
+				detector.start(ownAdress);
+				inputter.start(ownAdress);
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			
 
 			t.sendResponseHeaders(204, -1);
@@ -120,7 +128,7 @@ public class Server {
 			is.close();
 			System.out.println("");
 			t.sendResponseHeaders(204, -1);
-			inputter.fetch();
+			detector.unlock();
 		}
 	}
 	
