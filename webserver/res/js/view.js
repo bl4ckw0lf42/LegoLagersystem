@@ -55,24 +55,23 @@ $(document).ready(function () {
     $selection.start.connectBtn.click(function () {
         if (allowConnection) {
             addIconClass($selection.start.connectionIcons, iconClass.error);
-            connectRoboter();
+            startConnectTab();
         }
     });
 
 
     /**
+     * init function for Start Tab
      * connects everything and Starts shit
      */
-    function connectRoboter() {
+    function startConnectTab() {
         var ipServer = $selection.start.server.input.val();
         var ipRobo1 = $selection.start.robo1.input.val();
         var ipRobo2 = $selection.start.robo2.input.val();
         var ipRobo3 = $selection.start.robo3.input.val();
 
 /*
-        $selection.start.startDiv.css("display", "none");
-        $selection.main.mainDiv.css("display", "block");
-
+        showMainTab();
         setTimeout(function () {
             addOrderListItem("Red", 4);
         },2000);
@@ -91,13 +90,9 @@ $(document).ready(function () {
         var reqArray = [reqServer, req1, req2, req3];
 
         Promise.all(reqArray).then(function (beObj) {
-
-            allowConnect(true);
-
-            $selection.start.startDiv.css("display", "none");
-            $selection.main.mainDiv.css("display", "block");
-
             createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
+            allowConnect(true);
+            startMainTab();
         }, function (err) {
             allowConnect(true);
         });
@@ -128,6 +123,28 @@ $(document).ready(function () {
     }
 
     /**
+     * init function for Main Tab
+     */
+    function startMainTab() {
+        showMainTab();
+        startAutoDbRefresh();
+    }
+
+    /**
+     * starts the automatic Database Table refresh
+     */
+    function startAutoDbRefresh() {
+        setInterval(refreshOrderList, 5000);
+    }
+
+    /**
+     * refreshes Order List
+     */
+    function refreshOrderList () {
+        // TODO create Request
+    }
+
+    /**
      * disable / enable Connection Btn
      * @param allow
      */
@@ -151,6 +168,22 @@ $(document).ready(function () {
         $obj
             .removeClass(iconClass.connected + " " + iconClass.load + " " + iconClass.error)
             .addClass(iClass);
+    }
+
+    /**
+     * shows Main Tab
+     */
+    function showConnectTab () {
+        $selection.start.startDiv.css("display", "block");
+        $selection.main.mainDiv.css("display", "none");
+    }
+
+    /**
+     * shows Connect Tab
+     */
+    function showMainTab () {
+        $selection.start.startDiv.css("display", "none");
+        $selection.main.mainDiv.css("display", "block");
     }
 
     /**
@@ -214,7 +247,7 @@ $(document).ready(function () {
 
             $target.data("amount", (amount - 1));
 
-            // TODO sent order
+            // TODO send order
             console.log("ORDER");
 
             if (amount < 2) {
