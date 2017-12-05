@@ -99,6 +99,7 @@ public class Einlagern {
 					ml.setSpeed(0);
 					mr.setSpeed(0);
 					mm.rotate(150);
+					Remote.sendCommand(WebTest.SA, "/fetched", "0");
 					driven = 0;
 					mm.resetTachoCount();
 					turn();

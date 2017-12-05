@@ -55,6 +55,8 @@ public class Server {
 			};
 		});
 		serverThread.start();
+		
+		DAO.instance.connect();
 	}
 	
 	static class ConnectHandler implements HttpHandler {
@@ -126,7 +128,8 @@ public class Server {
 			InputStream is = t.getRequestBody();
 			String art = Utils.readStream(is);
 			is.close();
-			System.out.println("");
+			System.out.println("Storing wares...");
+			DAO.instance.storeArtikel("0", art);
 			t.sendResponseHeaders(204, -1);
 			detector.unlock();
 		}
