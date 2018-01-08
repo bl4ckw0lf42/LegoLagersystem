@@ -15,7 +15,7 @@ public class DAO {
 	private static final String USER = "lego";
 	private static final String PASSWORD = "";
 	
-	private static final String SLOT_SQL = "SELECT s.id, a.bezeichnung FROM slot AS s JOIN artikel AS a ON s.artikel_id=a.id;";
+	private static final String SLOT_SQL = "SELECT s.slotID, a.beschreibung FROM slot AS s JOIN artikel AS a ON s.artikelID=a.artikelID;";
 	private static final String ARTIKEL_SQL = "SELECT * FROM artikel";
 	private static final String STORE_ARTIKEL_SQL = "UPDATE slot SET artikel_id='%s' WHERE id='%s';";
 	
@@ -23,7 +23,7 @@ public class DAO {
 	
 	private java.sql.Connection connection;
 	
-	private String hostName = "10.103.112.12";
+	private String hostName = "10.103.112.11";
 	
 	private java.sql.Statement statement;
 	

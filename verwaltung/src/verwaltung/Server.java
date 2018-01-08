@@ -33,6 +33,7 @@ public class Server {
 		httpServer.createContext("/start", new StartHandler());
 		httpServer.createContext("/detect", new DetectHandler());
 		httpServer.createContext("/fetched", new FetchedHandler());
+		httpServer.createContext("/getStock", new StockHandler());
 		
 		System.out.println("Starting http server thread.");
 		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
@@ -132,6 +133,25 @@ public class Server {
 			DAO.instance.storeArtikel("0", art);
 			t.sendResponseHeaders(204, -1);
 			detector.unlock();
+		}
+	}
+	
+	static class StockHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange t) throws IOException {
+			try {
+				t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+				System.out.println("get Stored wares");
+
+				String bla = gson.toJson(DAO.instance.getArtikels());
+				
+				t.sendResponseHeaders(200, bla.length());
+				t.getResponseBody().write(bla.getBytes());
+				detector.unlock();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
