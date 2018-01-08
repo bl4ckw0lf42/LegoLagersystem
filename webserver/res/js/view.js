@@ -49,6 +49,10 @@ $(document).ready(function () {
         }
     };
 
+    var SERVERIP;
+    var ROBO1;
+    var ROBO2;
+    var ROBO3;
     var allowConnection = true;
 
 
@@ -65,10 +69,10 @@ $(document).ready(function () {
      * connects everything and Starts shit
      */
     function startConnectTab() {
-        var ipServer = $selection.start.server.input.val();
-        var ipRobo1 = $selection.start.robo1.input.val();
-        var ipRobo2 = $selection.start.robo2.input.val();
-        var ipRobo3 = $selection.start.robo3.input.val();
+        SERVERIP = $selection.start.server.input.val();
+        ROBO1 = $selection.start.robo1.input.val();
+        ROBO2 = $selection.start.robo2.input.val();
+        ROBO3 = $selection.start.robo3.input.val();
 
 /*
         showMainTab();
@@ -77,20 +81,21 @@ $(document).ready(function () {
         },2000);
         return;
 */
-        if (ipServer == "" || ipRobo1 == "" || ipRobo2 == "" || ipRobo3 == "") return;
+
+        if (SERVERIP === "" || ROBO1 === "" || ROBO2 === "" || ROBO3 === "") return;
 
         addIconClass($selection.start.connectionIcons, iconClass.load);
 
         allowConnect(false);
         
-        var reqServer = createRequest(ipServer, "connect");
-        var req1 = createRequest(ipRobo1, "connect");
-        var req2 = createRequest(ipRobo2, "connect");
-        var req3 = createRequest(ipRobo3, "connect");
+        var reqServer = createRequest(SERVERIP, "connect");
+        var req1 = createRequest(ROBO1, "connect");
+        var req2 = createRequest(ROBO2, "connect");
+        var req3 = createRequest(ROBO3, "connect");
         var reqArray = [reqServer, req1, req2, req3];
 
         Promise.all(reqArray).then(function (beObj) {
-            createPostRequest(ipServer, "start", JSON.stringify([ipRobo1, ipRobo2, ipRobo3]));
+            createPostRequest(SERVERIP, "start", JSON.stringify([ROBO1, ROBO2, ROBO3]));
             allowConnect(true);
             startMainTab();
         }, function (err) {
@@ -141,7 +146,11 @@ $(document).ready(function () {
      * refreshes Order List
      */
     function refreshOrderList () {
-        // TODO create Request
+        createRequest(SERVERIP, "getStock").then(function (beObj) {
+            console.log(beObj);
+        }, function (err) {
+            console.log(err);
+        });
     }
 
     /**
@@ -216,13 +225,13 @@ $(document).ready(function () {
     /**
      * adds an Item to the Order List
      * @param itemText
-     * @param amount
+     * @param slot
      * @param color
      */
-    function addOrderListItem (itemText, amount, color) {
+    function addOrderListItem (itemText, slot, color) {
         var $collection = $("<li></li>")
             .addClass("collection-item avatar")
-            .data("amount", amount);
+            .data("Slot", slot);
 
         var $iconColor = $("<div></div>")
             .addClass("orderIconColor")
@@ -230,7 +239,7 @@ $(document).ready(function () {
 
         var $amount = $("<span></span>")
             .addClass("title orderAmount")
-            .html(amount + "x");
+            .html("Slot: " + slot + " - ");
 
         var $text = $("<span></span>")
             .addClass("title")
@@ -242,24 +251,22 @@ $(document).ready(function () {
 
         $collection.on("click", function (ev) {
             var $target = $(ev.currentTarget);
-            var $amount = $target.find(".orderAmount");
-            var amount = $target.data("amount");
-
-            $target.data("amount", (amount - 1));
 
             // TODO send order
             console.log("ORDER");
 
-            if (amount < 2) {
-                $target.remove();
-            }
-            else {
-                $amount.html((amount - 1) + "x");
-            }
+            $target.remove();
         });
 
         $collection.append($iconColor).append($amount).append($text).append($iconOrder);
         $selection.main.order.table.append($collection);
+    }
+
+    /**
+     * clears Order List
+     */
+    function clearOrderList () {
+        $(".collection-item").remove();
     }
 });
 
