@@ -13,11 +13,6 @@ public class Einlagerer {
 	public static final int speed = 50;
 	public static final int fast = 120;
 	public static final int slow = 40;
-	public String color = "";
-	public int driven = 0;
-	public boolean beladen = false;
-	public int slot;
-	public int counter = 0;
 	
 	private LagerRoboter lagerRoboter;
 	
@@ -44,22 +39,23 @@ public class Einlagerer {
 		
 		while(slotsToSkip > 0) {
 			lagerRoboter.followLine(); // line folgen bis rot
-			lagerRoboter.driveDistance(0.01f); // über rote Linie fahren
+			lagerRoboter.driveDistance(0.02f); // über rote Linie fahren
 			slotsToSkip--;
 		}
 		
 		lagerRoboter.followLine();
 		lagerRoboter.stop();
 		lagerRoboter.raiseCrane();
+		lagerRoboter.driveDistance(-0.05f);
+		lagerRoboter.turn(180);
 	}
-
-	public String getColor() {
-		return color;
+	
+	public void returnToStart() {
+		lagerRoboter.followLine();
+		lagerRoboter.turn(180);
+		lagerRoboter.followLine();
 	}
-
-	public void setColor(String color) {
-		this.color = color;
-	}
+	
 	public void turn (){
 		double viertel = 0.45;
 		int rotateangle =(int)(360*((viertel * pathCircum) / wheeleCircum));
