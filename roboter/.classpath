@@ -7,6 +7,5 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="con" path="org.lejos.ev3.ldt.LEJOS_EV3_LIBRARY_CONTAINER"/>
-	<classpathentry kind="lib" path="H:/ev3Java/EV3 Lagersystem/mysql-connector-java-5.1.44/mysql-connector-java-5.1.44-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

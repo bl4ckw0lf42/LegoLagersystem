@@ -7,9 +7,9 @@ public class Roboter {
 
 	public final static float WHEEL_RADIUS = 0.028f;
 	public final static float WHEEL_WIDTH = 0.028f;
-	public final static float WHEEL_CIRCUMFENCE = 2.0f * Math.PI * WHEEL_RADIUS;
+	public final static double WHEEL_CIRCUMFENCE = 2.0f * Math.PI * WHEEL_RADIUS;
 	public final static float WHEEL_DISTANCE = 0.116f;
-	public final static float PATH_CIRCUMFENCE = 2.0f * Math.PI * WHEEL_DISTANCE;
+	public final static double PATH_CIRCUMFENCE = 2.0f * Math.PI * WHEEL_DISTANCE;
 
 	protected EV3LargeRegulatedMotor motorRight;
 	protected EV3LargeRegulatedMotor motorLeft;

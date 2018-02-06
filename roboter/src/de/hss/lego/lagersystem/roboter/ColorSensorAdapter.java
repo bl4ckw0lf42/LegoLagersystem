@@ -21,12 +21,26 @@ public class ColorSensorAdapter {
 	}
 	
 	public boolean red() {
-		return (sample[0] >= 0.1 &&
+		return (sample[0] >= 0.15 &&
 				sample[1] < 0.1 &&
 				sample[2] < 0.1);
 	}
 	
+	public boolean blue() {
+		return (sample[0] < 0.075 &&
+				sample[1] < 0.15 &&
+				sample[2] >= 0.15);
+	}
+	
 	public void updateSample() {
 		sensor.fetchSample(sample, 0);
+	}
+	
+	public float[] getSample() {
+		return sample;
+	}
+	
+	public String getSampleAsString() {
+		return sample[0] + ", " + sample[1] + ", " + sample[2];
 	}
 }

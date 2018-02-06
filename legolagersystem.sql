@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Erstellungszeit: 07. Dez 2017 um 11:49
+-- Erstellungszeit: 05. Feb 2018 um 10:36
 -- Server-Version: 10.1.28-MariaDB
 -- PHP-Version: 7.1.10
 
@@ -33,6 +33,16 @@ CREATE TABLE `artikel` (
   `beschreibung` varchar(99) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Daten für Tabelle `artikel`
+--
+
+INSERT INTO `artikel` (`artikelID`, `beschreibung`) VALUES
+(0, 'Holz'),
+(1, 'Eisen'),
+(2, 'Metall'),
+(3, 'Papier');
+
 -- --------------------------------------------------------
 
 --
@@ -43,6 +53,16 @@ CREATE TABLE `slot` (
   `slotID` int(99) NOT NULL,
   `artikelID` int(99) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Daten für Tabelle `slot`
+--
+
+INSERT INTO `slot` (`slotID`, `artikelID`) VALUES
+(0, NULL),
+(1, NULL),
+(2, NULL),
+(3, NULL);
 
 --
 -- Indizes der exportierten Tabellen

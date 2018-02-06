@@ -1,13 +1,14 @@
 package de.hss.lego.lagersystem.roboter;
 
+import lejos.hardware.lcd.LCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.sensor.EV3ColorSensor;
 
 public class LagerRoboter extends Roboter {
 	
-	public static final float BASE_SPEED = 50;
-	public static final float FAST_SPEED = BASE_SPEED * 1.25f;
-	public static final float SLOW_SPEED = BASE_SPEED * 0.75f;
+	public static final float BASE_SPEED = 80;
+	public static final float FAST_SPEED = BASE_SPEED * 1.33f;
+	public static final float SLOW_SPEED = BASE_SPEED * 0.66f;
 
 	protected EV3LargeRegulatedMotor motorMiddle;
 	protected ColorSensorAdapter colorFront;
@@ -25,7 +26,11 @@ public class LagerRoboter extends Roboter {
 		this.colorFront = new ColorSensorAdapter(colorFront);
 	}
 	
-	public void followLine() {
+	public void followLineTilRed() {
+		setSpeed(BASE_SPEED);
+		forward();
+
+		LCD.clear();
 		do {
 			colorFloor.updateSample();
 			if (colorFloor.black()){
@@ -35,15 +40,37 @@ public class LagerRoboter extends Roboter {
 				setSpeedLeft(SLOW_SPEED);
 				setSpeedRight(FAST_SPEED);
 			}
-		} while (colorFloor.red());
+			
+		} while (!(colorFloor.red()));
+	}
+	
+	
+	public void followLineTilBlue() {
+		setSpeed(BASE_SPEED);
+		forward();
+		do {
+			colorFloor.updateSample();
+			if (colorFloor.black()){
+				setSpeedLeft(FAST_SPEED);
+				setSpeedRight(SLOW_SPEED);
+			} else {
+				setSpeedLeft(SLOW_SPEED);
+				setSpeedRight(FAST_SPEED);
+			}
+		} while (!colorFloor.blue());
 	}
 	
 	public void lowerCrane() {
-		motorMiddle.rotate(150);
+		motorMiddle.rotate(-150);
 	}
 	
 	public void raiseCrane() {
-		motorMiddle.rotate(-150);
+		motorMiddle.rotate(150);
+	}
+	
+	public float[] getFrontColor (){
+		colorFront.updateSample();
+		return colorFront.getSample();
 	}
 	
 }
