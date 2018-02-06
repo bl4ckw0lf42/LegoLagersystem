@@ -16,14 +16,15 @@ public class DAO {
 	private static final String PASSWORD = "";
 	
 	private static final String SLOT_SQL = "SELECT s.slotID, a.beschreibung FROM slot AS s JOIN artikel AS a ON s.artikelID=a.artikelID;";
+	private static final String FREE_SLOT_SQL = "SELECT slotID FROM slot WHERE artikelID IS NULL;";
 	private static final String ARTIKEL_SQL = "SELECT * FROM artikel";
-	private static final String STORE_ARTIKEL_SQL = "UPDATE slot SET artikel_id='%s' WHERE id='%s';";
+	private static final String STORE_ARTIKEL_SQL = "UPDATE slot SET artikelID='%s' WHERE slotID='%s';";
 	
 	private HashMap<Integer, Integer> places = new HashMap<Integer, Integer>();
 	
 	private java.sql.Connection connection;
 	
-	private String hostName = "10.103.112.11";
+	private String hostName = "10.103.112.14";
 	
 	private java.sql.Statement statement;
 	
@@ -32,14 +33,10 @@ public class DAO {
 	private DAO() {
 	}
 
-	public void connect(){
-		try {
-			connection = DriverManager.getConnection("jdbc:mysql://" + hostName +"/" +
-					""+ DB_NAME, USER, PASSWORD);
-			statement = connection.createStatement();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+	public void connect() throws SQLException{
+		connection = DriverManager.getConnection("jdbc:mysql://" + hostName +"/" +
+				""+ DB_NAME, USER, PASSWORD);
+		statement = connection.createStatement();
 	}
 	
 	public HashMap<String, String> getSlots() {
@@ -82,6 +79,17 @@ public class DAO {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public String getFirstFreeSlotId() throws SQLException {
+		ResultSet rs = statement.executeQuery(FREE_SLOT_SQL);
+		ArrayList<String> list = new ArrayList<String>();
+		while (rs.next()) {
+			list.add(rs.getString(1));
+		}
+		rs.close();
+		
+		return list.get(0);
 	}
 	
 	

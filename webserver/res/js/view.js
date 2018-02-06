@@ -147,7 +147,12 @@ $(document).ready(function () {
      */
     function refreshOrderList () {
         createRequest(SERVERIP, "getStock").then(function (beObj) {
-            console.log(beObj);
+            var table = $("#orderTable");
+            table.find(".slot").remove();
+            var artikels = JSON.parse(beObj);
+            for (var key in artikels) {
+                table.append($("<div>").addClass("slot").text("Slot "+key+": " + artikels[key]));
+            }
         }, function (err) {
             console.log(err);
         });

@@ -2,6 +2,7 @@ package verwaltung;
 
 import java.io.*;
 import java.net.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 
@@ -22,20 +23,8 @@ public class Server {
 	static Remote outputter;
 	
 	static InetSocketAddress ownAdress;
-
-	public static void main(String[] args) throws IOException {
-		System.out.println(String.join(", ", args));
-		String interfaceName = args.length == 0 ? "wlan0" : args[0];
-		
-		httpServer = HttpServer.create( new InetSocketAddress(8000), 0);
-		
-		httpServer.createContext("/connect", new ConnectHandler());
-		httpServer.createContext("/start", new StartHandler());
-		httpServer.createContext("/detect", new DetectHandler());
-		httpServer.createContext("/fetched", new FetchedHandler());
-		httpServer.createContext("/getStock", new StockHandler());
-		
-		System.out.println("Starting http server thread.");
+	
+	private static void setOwnInetAddress(String interfaceName) throws SocketException {
 		Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 		while (interfaces.hasMoreElements()) {
 			NetworkInterface ni = interfaces.nextElement();
@@ -45,10 +34,27 @@ public class Server {
 				if (addr.getClass() == Inet4Address.class && interfaceName.equals(ni.getName())) {
 					
 					ownAdress = new InetSocketAddress(addr, 8000);
-					System.out.println("Own adress: " + ownAdress);
 				}
 			}
 		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		String interfaceName = args.length == 0 ? "wlan0" : args[0];
+		setOwnInetAddress(interfaceName);
+		System.out.println("Own adress: " + ownAdress);
+		
+		System.out.print("Starting http server thread... ");
+		
+		httpServer = HttpServer.create( new InetSocketAddress(8000), 0);
+		
+		httpServer.createContext("/connect", new ConnectHandler());
+		httpServer.createContext("/start", new StartHandler());
+		httpServer.createContext("/stored", new StoredHandler());
+		httpServer.createContext("/detect", new DetectHandler());
+		httpServer.createContext("/fetched", new FetchedHandler());
+		httpServer.createContext("/getStock", new StockHandler());
+		
 		serverThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -56,8 +62,17 @@ public class Server {
 			};
 		});
 		serverThread.start();
+
+		System.out.println("DONE");
 		
-		DAO.instance.connect();
+		try {
+			System.out.println("Connect to database.");
+			DAO.instance.connect();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			httpServer.stop(1);
+		}
+		
 	}
 	
 	static class ConnectHandler implements HttpHandler {
@@ -122,17 +137,59 @@ public class Server {
 		}
 	}
 	
+	public static String artikelIdByColor(float[] color) {
+		int index = 0;
+		float max = Float.NEGATIVE_INFINITY;
+		for (int i = 0; i<3; i++) {
+			if (color[i] > max) {
+				index = i;
+				max = color[i];
+			}
+		}
+		return Integer.toString(index);
+	}
+	
 	static class FetchedHandler implements HttpHandler {
 		@Override
 		public void handle(HttpExchange t) throws IOException {
 			t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 			InputStream is = t.getRequestBody();
-			String art = Utils.readStream(is);
+			String colorString = Utils.readStream(is);
+			System.out.println("Received color: " + colorString);
+			float[] color = gson.fromJson(colorString, float[].class);
+			String art = artikelIdByColor(color);
+			System.out.println("Artikel id: " + art);
 			is.close();
-			System.out.println("Storing wares...");
-			DAO.instance.storeArtikel("0", art);
+			String slotId = "";
+			try {
+				System.out.println("Storing wares...");
+				slotId = DAO.instance.getFirstFreeSlotId();
+				System.out.println("Slot id: " + slotId);
+				DAO.instance.storeArtikel(slotId, art);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+			inputter.store(Integer.parseInt(slotId));
 			t.sendResponseHeaders(204, -1);
-			detector.unlock();
+			//detector.unlock();
+		}
+	}
+	
+	static class StoredHandler implements HttpHandler {
+		@Override
+		public void handle(HttpExchange t) throws IOException {
+			try {
+				t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+				System.out.println("Stored, inputter ready...");
+				detector.unlock();
+				t.sendResponseHeaders(204, -1);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -143,11 +200,10 @@ public class Server {
 				t.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
 				System.out.println("get Stored wares");
 
-				String bla = gson.toJson(DAO.instance.getArtikels());
+				String bla = gson.toJson(DAO.instance.getSlots());
 				
 				t.sendResponseHeaders(200, bla.length());
 				t.getResponseBody().write(bla.getBytes());
-				detector.unlock();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
