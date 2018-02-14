@@ -24,7 +24,7 @@ public class DAO {
 	
 	private java.sql.Connection connection;
 	
-	private String hostName = "10.103.112.14";
+	private String hostName = "10.103.112.13";
 	
 	private java.sql.Statement statement;
 	
